@@ -18,6 +18,7 @@ import io.github.pronze.sba.config.SBAConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -43,8 +44,11 @@ public class LanguageService implements ILanguageService {
     public void load(JavaPlugin plugin) {
         locale = SBAConfig.getInstance().node("locale").getString("en");
         if (!validLocale.contains(locale.toLowerCase())) {
-            throw new UnsupportedOperationException("Invalid locale provided!");
+            Logger.warn("Invalid locale '{}' configured, falling back to 'en'", locale);
+            locale = "en";
         }
+
+        fallbackNode = loadBundledEnglishNode();
 
         try {
             var pathStr = plugin.getDataFolder().getAbsolutePath();
@@ -56,12 +60,37 @@ public class LanguageService implements ILanguageService {
                     .nodeStyle(NodeStyle.BLOCK)
                     .build();
             configurationNode = loader.load();
-
-            // temporarily until startup
-            fallbackNode = configurationNode;
         } catch (Exception ex) {
-            Bukkit.getLogger().warning("There was an error loading language file!");
-            ex.printStackTrace();
+            Bukkit.getLogger().warning("There was an error loading language file! Falling back to English.");
+            configurationNode = fallbackNode;
+        }
+
+        if (configurationNode == null) {
+            configurationNode = fallbackNode;
+        }
+    }
+
+    private ConfigurationNode loadBundledEnglishNode() {
+        try {
+            var fallbackLoader = YamlConfigurationLoader
+                    .builder()
+                    .buildAndLoadString(Objects.requireNonNull(readBundledEnglish(), "Bundled language file is missing"));
+            return fallbackLoader;
+        } catch (Exception ex) {
+            Logger.error("Could not load bundled fallback language, creating empty fallback node.");
+            return YamlConfigurationLoader
+                    .builder()
+                    .build()
+                    .createNode();
+        }
+    }
+
+    private String readBundledEnglish() throws Exception {
+        try (InputStream input = LanguageService.class.getResourceAsStream("/languages/language_en.yml")) {
+            if (input == null) {
+                throw new Exception("Input is null while loading fallback language");
+            }
+            return new String(input.readAllBytes());
         }
     }
 
@@ -94,7 +123,13 @@ public class LanguageService implements ILanguageService {
             fallbackNode = loader.load();
         } catch (Exception ex) {
             Bukkit.getLogger().warning("There was an error loading fallback language!");
-            ex.printStackTrace();
+            if (fallbackNode == null) {
+                fallbackNode = loadBundledEnglishNode();
+            }
+        }
+
+        if (configurationNode == null) {
+            configurationNode = fallbackNode;
         }
     }
 

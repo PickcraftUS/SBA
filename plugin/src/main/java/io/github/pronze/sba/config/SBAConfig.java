@@ -172,6 +172,18 @@ public class SBAConfig implements IConfigurator {
                         .back();
             generator.saveIfModified();
 
+                    // Always ensure generator tier timing defaults exist, even on old configs.
+                    generator.start().section("upgrades").section("time")
+                        .key("Diamond-II").defValue(300)
+                        .key("Emerald-II").defValue(700)
+                        .key("Diamond-III").defValue(1000)
+                        .key("Emerald-III").defValue(1300)
+                        .key("Diamond-IV").defValue(1500)
+                        .key("Emerald-IV").defValue(1800)
+                        .back()
+                        .back();
+                    generator.saveIfModified();
+
             Material repeater = Material.matchMaterial("REPEATER");
             if (repeater == null)
                 repeater = Material.matchMaterial("REDSTONE_WIRE");

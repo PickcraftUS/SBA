@@ -376,9 +376,16 @@ public class ShopUtil {
     }
 
     public static int getIntFromMode(String mode) {
-        return mode.equalsIgnoreCase("Solo") ? 1
-                : mode.equalsIgnoreCase("Double") ? 2
-                        : mode.equalsIgnoreCase("Triples") ? 3 : mode.equalsIgnoreCase("Squads") ? 4 : 0;
+        if (mode == null) {
+            return 0;
+        }
+
+        return switch (mode.trim().toLowerCase()) {
+            case "solo", "solos", "duel", "duels", "triple", "triples" -> 1;
+            case "double", "doubles", "duo", "duos" -> 2;
+            case "squad", "squads" -> 4;
+            default -> 0;
+        };
     }
 
     public static String translateColors(String s) {

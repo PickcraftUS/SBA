@@ -46,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,7 +59,8 @@ import java.util.stream.Collectors;
 public class SBACommand {
     private boolean gamesInvEnabled;
     static boolean init = false;
-    static List<String> allGameModes = List.of("solo", "double", "triples", "squads");
+    static List<String> allGameModes = List.of("solos", "duos", "duels", "squads");
+    private static final List<String> queueModes = List.of("solos", "duos", "duels", "squads");
 
     @OnPostEnable
     public void onPostEnabled() {
@@ -68,10 +70,102 @@ public class SBACommand {
         gamesInvEnabled = SBAConfig.getInstance().getBoolean("games-inventory.enabled", true);
         CommandManager.getInstance().getManager().getParserRegistry().registerSuggestionProvider("gameMode",
                 (commandSenderCommandContext, s) -> GamesInventory.getInstance().getGameModeNames());
+        CommandManager.getInstance().getManager().getParserRegistry().registerSuggestionProvider("queueMode",
+                (commandSenderCommandContext, s) -> queueModes);
         CommandManager.getInstance().getManager().getParserRegistry().registerSuggestionProvider("maps",
                 (ctx, s) -> Main.getGameNames());
         CommandManager.getInstance().getAnnotationParser().parse(this);
         init = true;
+    }
+
+    private String canonicalQueueMode(String mode) {
+        if (mode == null) {
+            return "";
+        }
+
+        var normalized = mode.trim().toLowerCase();
+        return switch (normalized) {
+            case "solo", "solos" -> "solos";
+            case "double", "doubles", "duo", "duos" -> "duos";
+            case "triple", "triples", "duel", "duels", "3x3x3x3", "3v3v3v3" -> "duels";
+            case "squad", "squads" -> "squads";
+            default -> "";
+        };
+    }
+
+    private List<Game> getConfiguredGamesForMode(String mode) {
+        var games = new ArrayList<Game>();
+        Main.getGameNames().forEach(gameName -> {
+            var tags = SBAConfig.getInstance().getStringList("map-tags." + gameName);
+            if (tags.stream().map(this::canonicalQueueMode).anyMatch(mode::equals)) {
+                var game = Main.getInstance().getGameByName(gameName);
+                if (game != null) {
+                    games.add(game);
+                }
+            }
+        });
+        return games;
+    }
+
+    private List<Game> getFallbackGamesForMode(String mode) {
+        return Main.getGameNames().stream()
+                .map(Main::getGame)
+                .filter(Objects::nonNull)
+                .filter(game -> {
+                    var teams = game.getAvailableTeams();
+                    return switch (mode) {
+                        case "solos" -> teams.stream().allMatch(t -> t.getMaxPlayers() == 1) && teams.size() > 2;
+                        case "duels" -> teams.stream().allMatch(t -> t.getMaxPlayers() == 1) && teams.size() == 2;
+                        case "duos" -> teams.stream().allMatch(t -> t.getMaxPlayers() == 2);
+                        case "squads" -> teams.stream().allMatch(t -> t.getMaxPlayers() == 4);
+                        default -> false;
+                    };
+                })
+                .collect(Collectors.toList());
+    }
+
+    private void joinByMode(Player player, String requestedMode) {
+        var mode = canonicalQueueMode(requestedMode);
+        if (mode.isEmpty()) {
+            player.sendMessage("Unknown mode. Use one of: solos, duos, duels, squads.");
+            return;
+        }
+
+        var couldNotFindGameMessage = LanguageService
+                .getInstance()
+                .get(MessageKeys.GAMES_INVENTORY_CANNOT_FIND_GAME);
+        var playerWrapper = Players.wrapPlayer(player);
+
+        var candidates = getConfiguredGamesForMode(mode);
+        if (candidates.isEmpty()) {
+            candidates = getFallbackGamesForMode(mode);
+        }
+
+        var waitingGames = candidates.stream()
+                .filter(game -> game.getStatus() == GameStatus.WAITING)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        if (waitingGames.isEmpty()) {
+            couldNotFindGameMessage.send(playerWrapper);
+            return;
+        }
+
+        var random = new Random();
+
+        var waitingWithPlayers = waitingGames.stream()
+                .filter(game -> game.getConnectedPlayers().size() > 0)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        if (!waitingWithPlayers.isEmpty()) {
+            waitingWithPlayers.sort(Comparator.comparingInt((Game g) -> g.getConnectedPlayers().size())
+                    .reversed()
+                    .thenComparing(g -> random.nextInt()));
+            waitingWithPlayers.get(0).joinToGame(player);
+            return;
+        }
+
+        Collections.shuffle(waitingGames, random);
+        waitingGames.get(0).joinToGame(player);
     }
 
     @CommandMethod("sba reload")
@@ -358,34 +452,50 @@ public class SBACommand {
     @CommandDescription("open GamesInventory for player")
     private void commandJoinRandom(
             final @NotNull Player player,
-            final @NotNull @Argument(value = "gamemode", suggestions = "gameMode") String gameMode) {
-        if (!gamesInvEnabled) {
-            final var disabled = LanguageService
+            final @NotNull @Argument(value = "gamemode", suggestions = "queueMode") String gameMode) {
+        joinByMode(player, gameMode);
+    }
+
+    @CommandMethod("sba quickjoin <gamemode>")
+    @CommandDescription("join a random waiting map by mode, preferring maps that already have players")
+    private void commandQuickJoin(
+            final @NotNull Player player,
+            final @NotNull @Argument(value = "gamemode", suggestions = "queueMode") String gameMode) {
+        joinByMode(player, gameMode);
+    }
+
+    @CommandMethod("sba setmap <map> <gamemode>")
+    @CommandDescription("tag a map for quickjoin mode")
+    @CommandPermission("sba.setmap")
+    private void commandSetMap(
+            final @NotNull CommandSender sender,
+            final @NotNull @Argument(value = "map", suggestions = "maps") String map,
+            final @NotNull @Argument(value = "gamemode", suggestions = "queueMode") String gameMode) {
+        var canonical = canonicalQueueMode(gameMode);
+        if (canonical.isEmpty()) {
+            sender.sendMessage("Unknown mode. Use one of: solos, duos, duels, squads.");
+            return;
+        }
+
+        var game = Main.getInstance().getGameByName(map);
+        if (game == null) {
+            var message = LanguageService
                     .getInstance()
-                    .get(MessageKeys.GAMES_INV_DISABLED)
+                    .get(MessageKeys.GAMESINV_NO_MAPS_WITH_NAME)
+                    .replace("%name%", map)
                     .toComponent();
-            Players.wrapPlayer(player).sendMessage(disabled);
-            return;
-        }
-        var couldNotFindGameMessage = LanguageService
-                .getInstance()
-                .get(MessageKeys.GAMES_INVENTORY_CANNOT_FIND_GAME);
-        final var playerWrapper = Players.wrapPlayer(player);
-        final var games = GamesInventory.getInstance().getGamesWithMode(gameMode);
-        if (games == null || games.isEmpty()) {
-            couldNotFindGameMessage.send(playerWrapper);
+            Players.wrapSender(sender).sendMessage(message);
             return;
         }
 
-        Random r = new Random();
-        games.sort(Comparator.comparing(c -> ((Game) c).getConnectedPlayers().size())
-                .reversed().thenComparing(c -> r.nextInt()));
-
-        games.stream()
-                .filter(game -> game.getStatus() == GameStatus.WAITING)
-                .findAny()
-                .ifPresentOrElse(game -> game.joinToGame(player),
-                        () -> couldNotFindGameMessage.send(playerWrapper));
+        try {
+            SBAConfig.getInstance().node("map-tags", game.getName()).set(List.of(canonical));
+            SBAConfig.getInstance().saveConfig();
+            sender.sendMessage("Map '" + game.getName() + "' is now tagged as '" + canonical + "'.");
+        } catch (SerializationException ex) {
+            sender.sendMessage("Failed to save map tag. Check console.");
+            ex.printStackTrace();
+        }
     }
 
     @CommandMethod("sba store open [shop]")

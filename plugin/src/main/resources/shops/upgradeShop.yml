@@ -1,16 +1,16 @@
 data:
   - stack: "IRON_CHESTPLATE;1;Protection;Click here to get more resistance to damage!"
     column: 2
-    price: 4 of diamond
+    price: 4 of emerald
     properties: protection
 
   - stack: "IRON_SWORD;1;Sharpness;Kill players quicker!."
     column: 1
-    price: 4 of diamond
+    price: 4 of emerald
     properties: sharpness
 
   - stack: "GOLDEN_PICKAXE;1;Efficiency;Break Blocks quicker!."
-    price: 4 of diamond
+    price: 4 of emerald
     column: 3
     properties: efficiency
 
@@ -33,12 +33,12 @@ data:
     column: 5
     row: 1
     properties: healpool
-    price: 8 of diamond
+    price: 8 of emerald
 
   - stack: "LEATHER;1;Traps;Trap your enemy"
     column: 7
     items:
-      - price: 2 of diamond
+      - price: 2 of emerald
         skip: 1
         properties: blindtrap
         stack:
@@ -48,7 +48,7 @@ data:
             - "§7Get informed when an enemy enters a 7 block radius of your base"
             - "§7Blind the foe and gain an upper advantage!"
 
-      - price: 2 of diamond
+      - price: 2 of emerald
         skip: 1
         properties: minertrap
         stack:
@@ -58,7 +58,7 @@ data:
             - "§7Get informed when an enemy enters a 7 block radius of your base"
             - "§7Slow Down their mining and gain an advantage!"
 
-      - price: 2 of diamond
+      - price: 2 of emerald
         skip: 1
         properties:
           name: trap

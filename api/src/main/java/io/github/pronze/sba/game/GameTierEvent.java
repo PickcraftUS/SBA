@@ -29,6 +29,15 @@ public class GameTierEvent {
     private static List<GameTierEvent> events = new ArrayList<>();
     private final String key;
 
+        private static final List<String> DEFAULT_TIMED_EVENTS = List.of(
+            "Diamond-II",
+            "Emerald-II",
+            "Diamond-III",
+            "Emerald-III",
+            "Diamond-IV",
+            "Emerald-IV"
+        );
+
     public static void load() {
         var keys = AddonAPI
                 .getInstance()
@@ -42,6 +51,17 @@ public class GameTierEvent {
                 events.add(gte);
             }
         }
+
+        // Fallback to sane defaults if config edits removed/invalidated timed events.
+        if (events.isEmpty()) {
+            DEFAULT_TIMED_EVENTS.forEach(defaultKey -> {
+                var gte = new GameTierEvent(defaultKey);
+                if (gte.getTime() > 0) {
+                    events.add(gte);
+                }
+            });
+        }
+
         events.sort(Comparator.comparing(e->((GameTierEvent)e).getTime()));
         events.add(GAME_END);
     }
@@ -58,10 +78,24 @@ public class GameTierEvent {
     }
 
     public int getTime() {
-        return AddonAPI
+        var configured = AddonAPI
                 .getInstance()
                 .getConfigurator()
                 .getInt("upgrades.time." + key, Integer.MAX_VALUE);
+
+        if (configured != Integer.MAX_VALUE) {
+            return configured;
+        }
+
+        return switch (key) {
+            case "Diamond-II" -> 300;
+            case "Emerald-II" -> 700;
+            case "Diamond-III" -> 1000;
+            case "Emerald-III" -> 1300;
+            case "Diamond-IV" -> 1500;
+            case "Emerald-IV" -> 1800;
+            default -> Integer.MAX_VALUE;
+        };
     }
 
     public static GameTierEvent ofOrdinal(int ordinal) {
