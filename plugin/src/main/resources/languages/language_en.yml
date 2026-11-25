@@ -160,7 +160,7 @@ scoreboard:
     - "<white><bold>Bedwars</bold>"
   lines:
     default:
-      - "<dark_gray>• <aqua>Match Live"
+      - "<dark_gray>• <aqua>Time Left: <white>%time%"
       - ""
       - "<white>Next: <aqua>%tier_task% <gray>in <white>%tier_time%"
       - ""
@@ -172,7 +172,7 @@ scoreboard:
       - ""
       - "<gray>pickcraft.us"
     five:
-      - "<dark_gray>• <aqua>Match Live"
+      - "<dark_gray>• <aqua>Time Left: <white>%time%"
       - ""
       - "<white>Next: <aqua>%tier_task% <gray>in <white>%tier_time%"
       - ""

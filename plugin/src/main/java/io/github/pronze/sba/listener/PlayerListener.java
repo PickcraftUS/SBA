@@ -527,14 +527,7 @@ public class PlayerListener implements Listener {
             }
         }
         if (player.hasPermission(Permissions.UPDATE.getKey())) {
-            {
-                if (SBA.getInstance().isPendingUpdate() && SBAConfig.getInstance().shouldWarnPlayerAboutUpdate()) {
-
-                    Bukkit.getScheduler().runTaskLater(SBA.getPluginInstance(), () -> {
-                        UpdateChecker.getInstance().sendToUser(player);
-                    }, 40L);
-                }
-            }
+            // Update notifications disabled
         }
     }
 }

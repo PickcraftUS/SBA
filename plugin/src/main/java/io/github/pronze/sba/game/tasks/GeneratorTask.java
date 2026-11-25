@@ -33,7 +33,7 @@ public class GeneratorTask extends BaseGameTask {
                 .getInstance()
                 .getBoolean("upgrades.show-upgrade-message", true);
 
-        multiplier = SBAConfig.getInstance().getDouble("upgrades.multiplier", 0.25);
+        multiplier = SBAConfig.getInstance().getDouble("upgrades.multiplier", 0.125);
     }
 
     @Override

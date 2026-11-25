@@ -23,14 +23,13 @@ data:
       add-levels: 0.2
       max-level: 2
       type:
-        - iron
-        - gold
+        - diamond
     stack:
       type: FURNACE
       amount: 1
-      display-name: "Forge Upgrade"
+      display-name: "Diamond Forge Upgrade"
       lore:
-        - "§7Increase odds of an extra ingot from nearby iron & gold generators by 20%"
+        - "§7Upgrade diamond generators to spawn faster"
     column: 7
     row: 0
 

@@ -92,10 +92,7 @@ public class UpdateChecker {
     private void promptUpdate(@NotNull String version) {
         this.version = version;
         isPendingUpdate = true;
-        if (SBAConfig.getInstance().shouldWarnConsoleAboutUpdate()) {
-            Bukkit.getLogger().info("§e§lTHERE IS A NEW UPDATE AVAILABLE Version: " + version);
-            Bukkit.getLogger().info("Download it from here: " + downloadUrl + " or run §e/sba updateplugin");
-        }
+        // Console update notifications disabled
     }
 
     public void sendToUser(@NotNull Player player) {
