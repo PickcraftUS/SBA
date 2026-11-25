@@ -727,7 +727,7 @@ public class SBAStoreInventoryV2 extends AbstractStoreInventory {
                                         LanguageService.getInstance().get(MessageKeys.SHOP_PAGE_FORWARD).toComponent()))
                         .cosmeticItem(SBAConfig.getInstance().readDefinedItem(
                                 SBAConfig.getInstance().node("shop", "shopcosmetic"),
-                                "GRAY_STAINED_GLASS_PANE"))
+                                "AIR"))
                         .rows(SBAConfig.getInstance().node("shop", "rows").getInt(6))
                         .renderActualRows(
                                 SBAConfig.getInstance().node("shop", "render-actual-rows").getInt(6))

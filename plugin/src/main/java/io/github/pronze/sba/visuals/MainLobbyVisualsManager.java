@@ -187,13 +187,11 @@ public class MainLobbyVisualsManager implements Listener {
             var header = LanguageService
                     .getInstance()
                     .get(MessageKeys.MAIN_LOBBY_TABLIST_HEADER)
-                    .replace("%sba_version%", SBA.getInstance().getVersion())
                     .toComponent();
 
             var footer = LanguageService
                     .getInstance()
                     .get(MessageKeys.MAIN_LOBBY_TABLIST_FOOTER)
-                    .replace("%sba_version%", SBA.getInstance().getVersion())
                     .toComponent();
             playerData.sendPlayerListHeaderFooter(header, footer);
         }
@@ -224,7 +222,6 @@ public class MainLobbyVisualsManager implements Listener {
 
                     return hook
                             .getLine()
-                            .replace("%sba_version%", SBA.getInstance().getVersion())
                             .replace("%kills%", String.valueOf(playerStatistic.getKills()))
                             .replace("%beddestroys%", String.valueOf(playerStatistic.getDestroyedBeds()))
                             .replace("%deaths%", String.valueOf(playerStatistic.getDeaths()))

@@ -181,7 +181,6 @@ public class GameScoreboardManager implements io.github.pronze.sba.manager.Score
                     final var generatorTask = arena.getTask(GeneratorTask.class).orElseThrow();
 
                     line = line
-                            .replace("%sba_version%", SBA.getInstance().getVersion())
                             .replace("%team%", teamName)
                             .replace("%beds%", currentBedDestroys)
                             .replace("%dies%", currentDeaths)
@@ -191,7 +190,6 @@ public class GameScoreboardManager implements io.github.pronze.sba.manager.Score
                             .replace("%time%", game.getFormattedTimeLeft())
                             .replace("%formattime%", game.getFormattedTimeLeft())
                             .replace("%game%", game.getName())
-                            .replace("%date%", DateUtils.getFormattedDate())
                             .replace("%team_bed_status%", teamStatus == null ? "" : teamStatus)
                             .replace("%tier_task%", generatorTask.getNextTierName())
                             .replace("%tier_time%", generatorTask.getTimeLeftForNextEvent())

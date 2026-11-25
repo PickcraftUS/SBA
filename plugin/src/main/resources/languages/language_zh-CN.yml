@@ -99,7 +99,6 @@ lobby-scoreboard:
   squad-prefix: "四人" #For backward compatibility
   squads-prefix: "四人"
   lines:
-    - "<gray>%date%"
     - ""
     - "<white>地图: <green>%game%"
     - "<white>玩家数: <green>%players%/%maxplayers%"
@@ -109,7 +108,6 @@ lobby-scoreboard:
     - "<white>模式: <green>%mode%"
     - "<white>版本: <gray>v1.1"
     - ""
-    - "<yellow>SBA v%sba_version%"
   state:
     waiting: "<white>等待中……"
     countdown: "<white>将在<green>%countdown%秒<white>内开始"
@@ -184,7 +182,6 @@ scoreboard:
     - "<white><bold>BED WARS"
   lines:
     default:
-      - "<gray>%date%"
       - ""
       - "%tier_task%: %tier_time%"
       - ""
@@ -193,22 +190,19 @@ scoreboard:
       - "<white>击杀数: <green>%kills%"
       - "<white>破坏床数: <green>%beds%"
       - ""
-      - "<yellow>SBA v%sba_version%"
     five:
-      - "<gray>%date%"
       - ""
       - "%tier_task%: %tier_time%"
       - ""
       - "%team_status%"
       - ""
-      - "<yellow>SBA v%sba_version%"
 main-lobby:
   chat-format: "%color%[%level%✫] %name%: %message%"
   tablist:
     header:
       - "<aqua>您正在 <yellow><bold>WWW.SAMPLE.NET<reset> <aqua>上游玩"
     footer:
-      - '<yellow><bold>SBA v%sba_version%'
+      - ""
   scoreboard:
     title: "<yellow><bold>BED WARS</bold>"
     lines:
@@ -396,7 +390,7 @@ shop:
     upgrade-shop-display-name:
       - "<aqua>升级商店"
       - "<yellow><bold>右键点击"
-  name: "[SBA] 商店"
+  name: "商店"
   page_back: "上一页"
   page_forward: "下一页"
   shop_back: "<red>返回分类列表"

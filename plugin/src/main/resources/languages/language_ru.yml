@@ -91,7 +91,6 @@ lobby-scoreboard:
   triples-prefix: "Трио"
   squads-prefix: "Сквады"
   lines:
-    - "<gray>%date%"
     - ""
     - "<white>Карта: <green>%game%"
     - "<white>Игроки: <green>%players%/%maxplayers%"
@@ -101,7 +100,6 @@ lobby-scoreboard:
     - "<white>Режим: <green>%mode%"
     - "<white>Версия: <gray>v1.1"
     - ""
-    - "<yellow>SBA v%sba_version%"
   state:
     waiting: "<white>Ожидание..."
     countdown: "<white>Начало через <green>%countdown%s"
@@ -176,7 +174,6 @@ scoreboard:
     - "<white><bold>BED WARS"
   lines:
     default:
-      - "<gray>%date%"
       - ""
       - "%tier_task% in %tier_time%"
       - ""
@@ -185,22 +182,19 @@ scoreboard:
       - "<white>Убийств: <green>%kills%"
       - "<white>Кроватей сломано: <green>%beds%"
       - ""
-      - "<yellow>SBA v%sba_version%"
     five:
-      - "<gray>%date%"
       - ""
       - "%tier_task% in %tier_time%"
       - ""
       - "%team_status%"
       - ""
-      - "<yellow>SBA v%sba_version%"
 main-lobby:
   chat-format: "%color%[%level%✫] %name%: %message%"
   tablist:
     header:
       - "<aqua>Ты играешь на <yellow><bold>WWW.SAMPLE.NET"
     footer:
-      - '<yellow><bold>SBA v%sba_version%'
+      - ""
   scoreboard:
     title: "<yellow><bold>BED WARS</bold>"
     lines:
@@ -215,7 +209,6 @@ main-lobby:
       - ""
       - "У/С: <gold>%kdr%"
       - ""
-      - "<yellow>SBA v%sba_version%"
 party:
   chat-format: "<blue>Party </blue><gray>>></gray> %name%<white>: %message%"
   message:

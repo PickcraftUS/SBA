@@ -69,11 +69,17 @@ public class SBACommand {
             return;
         gamesInvEnabled = SBAConfig.getInstance().getBoolean("games-inventory.enabled", true);
         CommandManager.getInstance().getManager().getParserRegistry().registerSuggestionProvider("gameMode",
-                (commandSenderCommandContext, s) -> GamesInventory.getInstance().getGameModeNames());
+                (commandSenderCommandContext, s) -> GamesInventory.getInstance().getGameModeNames().stream()
+                        .filter(name -> s == null || name.toLowerCase().startsWith(s.toLowerCase()))
+                        .collect(Collectors.toList()));
         CommandManager.getInstance().getManager().getParserRegistry().registerSuggestionProvider("queueMode",
-                (commandSenderCommandContext, s) -> queueModes);
+                (commandSenderCommandContext, s) -> queueModes.stream()
+                        .filter(name -> s == null || name.toLowerCase().startsWith(s.toLowerCase()))
+                        .collect(Collectors.toList()));
         CommandManager.getInstance().getManager().getParserRegistry().registerSuggestionProvider("maps",
-                (ctx, s) -> Main.getGameNames());
+                (ctx, s) -> Main.getGameNames().stream()
+                        .filter(name -> s == null || name.toLowerCase().startsWith(s.toLowerCase()))
+                        .collect(Collectors.toList()));
         CommandManager.getInstance().getAnnotationParser().parse(this);
         init = true;
     }

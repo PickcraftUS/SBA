@@ -171,8 +171,6 @@ public class LobbyScoreboardManager implements Listener {
 
         lobbyScoreboardLines.forEach(line -> {
             line = line
-                    .replace("%sba_version%", SBA.getInstance().getVersion())
-                    .replace("%date%", DateUtils.getFormattedDate())
                     .replace("%state%", finalState)
                     .replace("%game%", game.getName())
                     .replace("%players%", String.valueOf(game.getConnectedPlayers().size()))
